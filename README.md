@@ -282,6 +282,25 @@ TRANSPORT=http \
 - `POST /mcp` — MCP protocol endpoint
 - `GET /health` — Health check (`{"status":"ok"}`)
 
+### Docker (port 3000)
+
+```bash
+docker build -t meta-ads-mcp-server .
+docker run --rm -p 3000:3000 \
+  -e META_ADS_ACCESS_TOKEN=YOUR_TOKEN \
+  meta-ads-mcp-server
+```
+
+The container runs Streamable HTTP at `http://localhost:3000/mcp`; check `http://localhost:3000/health` for readiness. Set `META_ADS_ENABLE_WRITE_TOOLS=true` only when write operations are needed.
+
+To build and publish an image to Docker Hub, pass the repository, tag, and Docker Hub username. Provide the Docker Hub token on stdin:
+
+```bash
+printf '%s\n' "$DOCKER_HUB_TOKEN" | ./docker-build.sh YOUR_USERNAME/meta-ads-mcp-server latest YOUR_USERNAME
+```
+
+Set `PLATFORMS` to override the default `linux/amd64` target. The script runs `docker buildx build --push`.
+
 ### Adding to Claude.ai
 
 1. Go to **Settings → Connectors → Add custom connector**

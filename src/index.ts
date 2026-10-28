@@ -46,23 +46,22 @@ import { registerBudgetScheduleTools } from "./tools/budget-schedules.js";
 import { getAccessToken } from "./services/graph-api.js";
 import { isWriteToolsEnabled } from "./constants.js";
 
-const server = new McpServer({
-  name: "meta-ads-mcp-server",
-  version,
-});
-
-registerAccountTools(server);
-registerInsightsTools(server);
-registerCampaignTools(server);
-registerAdSetTools(server);
-registerAdTools(server);
-registerCreativeTools(server);
-registerMediaTools(server);
-registerActivityTools(server);
-registerPaginationTools(server);
-registerTargetingTools(server);
-registerPageTools(server);
-registerBudgetScheduleTools(server);
+function createServer(): McpServer {
+  const server = new McpServer({ name: "meta-ads-mcp-server", version });
+  registerAccountTools(server);
+  registerInsightsTools(server);
+  registerCampaignTools(server);
+  registerAdSetTools(server);
+  registerAdTools(server);
+  registerCreativeTools(server);
+  registerMediaTools(server);
+  registerActivityTools(server);
+  registerPaginationTools(server);
+  registerTargetingTools(server);
+  registerPageTools(server);
+  registerBudgetScheduleTools(server);
+  return server;
+}
 
 if (isWriteToolsEnabled()) {
   console.error(
@@ -87,6 +86,7 @@ async function runStdio(): Promise<void> {
   }
 
   const transport = new StdioServerTransport();
+  const server = createServer();
   await server.connect(transport);
   console.error("Meta Ads MCP server running via stdio");
 }
@@ -106,6 +106,7 @@ async function runHTTP(): Promise<void> {
   app.use(express.json());
 
   app.post("/mcp", async (req, res) => {
+    const server = createServer();
     const transport = new StreamableHTTPServerTransport({
       sessionIdGenerator: undefined,
       enableJsonResponse: true,
